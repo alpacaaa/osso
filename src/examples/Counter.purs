@@ -3,13 +3,9 @@ module Examples.Counter where
 import Prelude
 
 import Control.Monad.Eff (Eff)
-import Control.Monad.Aff (Aff, Milliseconds(..))
-import Control.Monad.Aff as Aff
-import Data.Array as Array
-import Data.Maybe as Maybe
-import Html (Html, div, text, button, br, li, input)
+import Html (Html, div, text, button, br, input)
 import Html as Html
-import Html.Attributes (classes, type_, value)
+import Html.Attributes (type_, value)
 import Html.Events (onClick, onChange)
 import Signal (Signal)
 import Signal.Time as Signal
