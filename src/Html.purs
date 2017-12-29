@@ -203,6 +203,9 @@ br = elem DOM.br
 a :: forall msg. Element msg
 a = elem DOM.a
 
+ul :: forall msg. Element msg
+ul = elem DOM.ul
+
 li :: forall msg. Element msg
 li = elem DOM.li
 
