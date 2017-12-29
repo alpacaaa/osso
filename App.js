@@ -3,8 +3,8 @@
 var React = require('react')
 var ReactDOM = require('react-dom')
 
-const Counter = require('./Counter.purs')
-const Html = require('./Html.purs')
+const Counter = require('./src/examples/Counter.purs')
+const Html = require('./src/Html.purs')
 
 if (module.hot) {
   module.hot.accept();

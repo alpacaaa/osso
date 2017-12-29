@@ -27,7 +27,7 @@ module.exports = {
     stats: 'errors-only'
   },
 
-  entry: './src/App.js',
+  entry: './App.js',
 
   output: {
     path: __dirname,

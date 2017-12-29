@@ -1,4 +1,4 @@
-module Counter where
+module Examples.Counter where
 
 import Prelude
 
