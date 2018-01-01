@@ -1,6 +1,7 @@
 module Html.Attributes where
 
 import Prelude
+
 import Data.Array as Array
 import Data.String as String
 import Data.Tuple (Tuple(..))
@@ -44,6 +45,15 @@ selected = attr P.selected
 key :: forall msg. String -> Attribute msg
 key = attr P.key
 
+src :: forall msg. String -> Attribute msg
+src = attr P.src
+
+alt :: forall msg. String -> Attribute msg
+alt = attr P.alt
+
+tabindex :: forall msg. Int -> Attribute msg
+tabindex = attr P.tabIndex
+
 classList :: forall msg. Array (Tuple String Boolean) -> Attribute msg
 classList input =
   let
@@ -56,3 +66,13 @@ classList input =
       Array.foldl folder [] input
   in
   classes (String.joinWith " " valid)
+
+style :: forall msg. Array (Tuple String String) -> Attribute msg
+style input =
+  input
+  # map (\(Tuple k v) -> k <> ": " <> v)
+  # String.joinWith "; "
+  # attribute "style"
+
+placeholder :: forall msg. String -> Attribute msg
+placeholder = attr P.placeholder

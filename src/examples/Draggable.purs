@@ -26,9 +26,10 @@ type State =
   { items :: Array String }
 
 
-initialState :: State
-initialState =
-  { items: [ "Purescript", "Elm", "Typescript", "Bucklescript"]}
+init :: { state :: State, effects :: Array Unit }
+init =
+  Html.noFx
+    { items: [ "Purescript", "Elm", "Typescript", "Bucklescript"]}
 
 update :: Msg -> State -> { state :: State, effects :: Array Unit }
 update msg state =
@@ -82,11 +83,11 @@ view state =
   ]
 
 
-program :: Eff _ (Html.Program Msg State _)
+program :: Eff _ (Html.Program Msg State Unit _)
 program = Html.program
   { view
   , update
-  , initialState
+  , init
   , subscriptions: []
   , effectManager: const (pure [])
   }

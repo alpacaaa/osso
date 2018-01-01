@@ -52,11 +52,9 @@ type Button =
     { buttonId :: String, labelText :: String, msg :: Msg }
 
 
-initialState :: Model
-initialState =
-    { rows: []
-    , lastId: 0
-    }
+init :: { state :: Model, effects :: Array (Effect Msg) }
+init =
+    Html.noFx { rows: [], lastId: 0 }
 
 
 
@@ -112,12 +110,12 @@ effectManager (RandomRows amount lastId next) = do
     pure [next rows]
 
 
-program :: Eff _ (Html.Program Msg Model _)
+program :: Eff _ (Html.Program Msg Model (Effect Msg) _)
 program =
     Html.program
         { view
         , update
-        , initialState
+        , init
         , subscriptions: []
         , effectManager
         }

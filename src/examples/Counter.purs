@@ -24,12 +24,13 @@ type State =
   }
 
 
-initialState :: State
-initialState =
-  { count: 0
-  , value: ""
-  , ticks: 0
-  }
+init :: { state :: State, effects :: Array Unit }
+init =
+  Html.noFx
+    { count: 0
+    , value: ""
+    , ticks: 0
+    }
 
 
 update :: Msg -> State -> { state :: State, effects :: Array Unit }
@@ -76,11 +77,11 @@ ticker =
   # map (\_ -> [Tick])
 
 
-program :: Eff _ (Html.Program Msg State _)
+program :: Eff _ (Html.Program Msg State Unit _)
 program = Html.program
   { view
   , update
-  , initialState
+  , init
   , subscriptions: [ticker]
   , effectManager: const (pure [])
   }

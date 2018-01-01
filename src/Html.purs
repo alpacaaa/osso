@@ -1,4 +1,19 @@
-module Html where
+module Html
+  ( module Exports
+  , Html(..)
+  , Program
+  , Subscriber
+  , Dispatch
+  , EffectManager
+  , UpdateResult
+  , unwrapHtml
+  , createComponent
+  , noFx, withFx
+  , program
+  , text, input, textarea, br, a, ul, li, div, button, h1, table, tbody, tr, td, span
+  , nav, i, b, em, strong, header, footer, img, fieldset, p, article, section, main_
+  )
+  where
 
 import Prelude
 
@@ -10,6 +25,7 @@ import Control.Monad.Eff.Class (liftEff)
 import Control.Parallel as Parallel
 import Data.Array as Array
 import Html.Attributes (Attribute, unwrapAttr)
+import Html.Attributes (Attribute) as Exports
 import React (ReactClass)
 import React as React
 import React.DOM as DOM
@@ -38,10 +54,10 @@ type Element msg =
 type Subscriber state eff =
   (state -> Eff eff Unit) -> Eff eff Unit
 
-type Program msg state eff =
+type Program msg state fx eff =
   { render       :: ReactClass state
   , subscribe    :: Subscriber state eff
-  , initialState :: state
+  , init         :: UpdateResult state fx
   }
 
 type Update msg state fx =
@@ -56,7 +72,7 @@ type EffectManager msg fx eff =
 type App msg state fx eff =
   { view          :: state -> Html msg
   , update        :: Update msg state fx
-  , initialState  :: state
+  , init          :: UpdateResult state fx
   , subscriptions :: Array (Signal.Signal (Array msg))
   , effectManager :: EffectManager msg fx eff
   }
@@ -126,7 +142,7 @@ subscribe app eventCh fn =
       Array.foldl Signal.merge (Channel.subscribe eventCh) app.subscriptions
 
     signal =
-      Signal.foldp (foldUpdate app.update) { state: app.initialState, effects: [] } events
+      Signal.foldp (foldUpdate app.update) app.init events
 
     process =
       runner eventCh fn app.effectManager
@@ -140,7 +156,7 @@ render dispatch view =
     unwrapHtml dispatch (view state)
 
 
-program :: forall msg state fx. App msg state fx _ -> Eff _ (Program msg state _)
+program :: forall msg state fx. App msg state fx _ -> Eff _ (Program msg state fx _)
 program app = do
   eventCh <- Channel.channel []
 
@@ -148,11 +164,11 @@ program app = do
     dispatch msg =
       Channel.send eventCh [msg]
       # Unsafe.unsafePerformEff -- see comment at the top of the file
-  
+
   pure
     { render: render dispatch app.view
     , subscribe: subscribe app eventCh
-    , initialState: app.initialState
+    , init: app.init
     }
 
 
@@ -170,7 +186,7 @@ withFx effects state =
 -- Useful when you just want to run the app
 -- and don't want to deal with all the wirings yourself.
 -- Alternatively, use `render` and `subscribe` directly.
-createComponent :: forall msg state. Program msg state _ -> React.ReactClass state
+createComponent :: forall msg state fx. Program msg state fx _ -> React.ReactClass state
 createComponent program =
   let
     el =
@@ -179,9 +195,12 @@ createComponent program =
     render ctx = do
       state <- React.readState ctx
       pure $ el state []
+
+    initialState =
+      program.init.state
   in
   React.createClass $
-    (React.spec program.initialState render)
+    (React.spec initialState render)
       { componentDidMount = \ctx ->
         program.subscribe \state ->
           void $ React.writeState ctx state
@@ -196,6 +215,9 @@ text str =
 
 input :: forall msg. Element msg
 input = elem DOM.input
+
+textarea :: forall msg. Element msg
+textarea = elem DOM.textarea
 
 br :: forall msg. Element msg
 br = elem DOM.br
@@ -232,3 +254,42 @@ td = elem DOM.td
 
 span :: forall msg. Element msg
 span = elem DOM.span
+
+nav :: forall msg. Element msg
+nav = elem DOM.nav
+
+i :: forall msg. Element msg
+i = elem DOM.i
+
+b :: forall msg. Element msg
+b = elem DOM.b
+
+em :: forall msg. Element msg
+em = elem DOM.em
+
+strong :: forall msg. Element msg
+strong = elem DOM.strong
+
+header :: forall msg. Element msg
+header = elem DOM.header
+
+footer :: forall msg. Element msg
+footer = elem DOM.footer
+
+img :: forall msg. Element msg
+img = elem DOM.img
+
+fieldset :: forall msg. Element msg
+fieldset = elem DOM.fieldset
+
+p :: forall msg. Element msg
+p = elem DOM.p
+
+article :: forall msg. Element msg
+article = elem DOM.article
+
+section :: forall msg. Element msg
+section = elem DOM.section
+
+main_ :: forall msg. Element msg
+main_ = elem DOM.main
